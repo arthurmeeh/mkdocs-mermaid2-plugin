@@ -287,9 +287,7 @@ class MarkdownMermaidPlugin(BasePlugin):
                     soup.body.append(new_tag)
                     new_tag = soup.new_tag("script")
             if self._mermaid_icons:
-                icon_packs = []
-                for icon_pack_def in self._mermaid_icons:
-                    icon_packs.append(f"{{name: {icon_pack_def['name']}, loader: () => import({icon_pack_def['module']}).then((module) => module.icons)}}")
+                icon_packs = map(lambda p: f'{{name: "{p['name']}", loader: () => import("{p['module']}").then((module) => module.icons)}}', self._mermaid_icons)
                 js_code.append("mermaid.registerIconPacks([%s]);" % str.join(',', icon_packs))
             # (self.mermaid_args), as found in the config file.
             if self.activate_custom_loader:
