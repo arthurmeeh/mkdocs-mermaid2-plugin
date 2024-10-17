@@ -200,6 +200,7 @@ class MarkdownMermaidPlugin(BasePlugin):
         self._full_config = config
         # Storing the arguments to be passed to the Javascript library;
         # they are found under `mermaid2:arguments` in the config file:
+        self._mermaid_icons = self.config['icons']
         self._mermaid_args = self.config['arguments']
         # Here we used the standard self.config property
         # (this can get confusing...)
@@ -285,7 +286,11 @@ class MarkdownMermaidPlugin(BasePlugin):
                     # it's necessary to close and reopen the tag:
                     soup.body.append(new_tag)
                     new_tag = soup.new_tag("script")
-
+            if self._mermaid_icons:
+                icon_packs = []
+                for icon_pack_def in self._mermaid_icons:
+                    icon_packs.append(f"{{name: {icon_pack_def['name']}, loader: () => import({icon_pack_def['module']}).then((module) => module.icons)}}")
+                js_code.append("mermaid.registerIconPacks([%s]);" % str.join(',', icon_packs))
             # (self.mermaid_args), as found in the config file.
             if self.activate_custom_loader:
                 # if the superfences extension is present, use the specific loader
